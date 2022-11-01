@@ -17,6 +17,7 @@ import "@solana/wallet-adapter-react-ui/styles.css";
 import "../styles/globals.css";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
+import { SnackbarProvider } from "notistack";
 
 const darkTheme = createTheme({
   palette: {
@@ -25,7 +26,9 @@ const darkTheme = createTheme({
 });
 
 export default function App({ Component, pageProps }: AppProps) {
-  const network = "mainnet-beta" as WalletAdapterNetwork;
+  const network = process.env["NEXT_PUBLIC_SOLANA_NETWORK"]
+    ? (process.env["NEXT_PUBLIC_SOLANA_NETWORK"] as WalletAdapterNetwork)
+    : ("devnet" as WalletAdapterNetwork);
   const wallets = useMemo(
     () => [
       new PhantomWalletAdapter(),
@@ -39,13 +42,15 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-      <ConnectionProvider endpoint={clusterApiUrl(network)}>
-        <WalletProvider wallets={wallets} autoConnect>
-          <WalletModalProvider>
-            <Component {...pageProps} />
-          </WalletModalProvider>
-        </WalletProvider>
-      </ConnectionProvider>
+      <SnackbarProvider>
+        <ConnectionProvider endpoint={clusterApiUrl(network)}>
+          <WalletProvider wallets={wallets} autoConnect>
+            <WalletModalProvider>
+              <Component {...pageProps} />
+            </WalletModalProvider>
+          </WalletProvider>
+        </ConnectionProvider>
+      </SnackbarProvider>
     </ThemeProvider>
   );
 }

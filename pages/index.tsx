@@ -4,6 +4,7 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { useEffect, useMemo, useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useSnackbar } from "notistack";
 import {
   guestIdentity,
   Metaplex,
@@ -17,6 +18,7 @@ export default function Home() {
 
   const { connection } = useConnection();
   const { wallet, publicKey } = useWallet();
+  const { enqueueSnackbar } = useSnackbar();
 
   const metaplex = useMemo(() => {
     return connection
@@ -34,8 +36,16 @@ export default function Home() {
         candyMachine,
         collectionUpdateAuthority: candyMachine.authorityAddress,
       });
+      enqueueSnackbar("You've successfully minted an NFT!", {
+        variant: "success",
+        anchorOrigin: { vertical: "top", horizontal: "right" },
+      });
     } catch (error) {
       console.error("Mint Error", error);
+      enqueueSnackbar("Mint Error: Check console logs for more details", {
+        variant: "error",
+        anchorOrigin: { vertical: "top", horizontal: "right" },
+      });
     }
     setMintLoading(false);
   };
@@ -52,7 +62,14 @@ export default function Home() {
       if (!candyMachine) throw new Error("No Candymachine at address");
       setCandyMachine(candyMachine);
     } catch (error) {
-      console.log("Error");
+      console.log("Fetching CM Error", error);
+      enqueueSnackbar(
+        "Fetching CM Error: Check console logs for more details",
+        {
+          variant: "error",
+          anchorOrigin: { vertical: "top", horizontal: "right" },
+        }
+      );
     }
 
     setPageLoading(false);
