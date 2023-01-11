@@ -15,7 +15,7 @@ import {
 import React, { useMemo } from "react";
 import "@solana/wallet-adapter-react-ui/styles.css";
 import "../styles/globals.css";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { SnackbarProvider } from "notistack";
 
@@ -40,7 +40,7 @@ export default function App({ Component, pageProps }: AppProps) {
   );
 
   return (
-    <ThemeProvider theme={darkTheme}>
+    <>
       <CssBaseline />
       <SnackbarProvider>
         <ConnectionProvider endpoint={clusterApiUrl(network)}>
@@ -51,6 +51,6 @@ export default function App({ Component, pageProps }: AppProps) {
           </WalletProvider>
         </ConnectionProvider>
       </SnackbarProvider>
-    </ThemeProvider>
+    </>
   );
 }
