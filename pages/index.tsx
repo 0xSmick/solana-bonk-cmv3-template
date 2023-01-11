@@ -45,15 +45,18 @@ export default function Home() {
         candyMachine,
         collectionUpdateAuthority: candyMachine.authorityAddress,
       });
+
       const mintResponse = await mint?.response;
-      enqueueSnackbar(
-        `Mint Succeeded: https://explorer.solscan.io/tx/${mintResponse.signature}`,
-        {
-          variant: "success",
-          anchorOrigin: { vertical: "top", horizontal: "right" },
-        }
-      );
-      console.log(mintResponse);
+      if (mintResponse) {
+        enqueueSnackbar(
+          `Mint Succeeded: https://explorer.solscan.io/tx/${mintResponse.signature}`,
+          {
+            variant: "success",
+            anchorOrigin: { vertical: "top", horizontal: "right" },
+          }
+        );
+        console.log(mintResponse);
+      }
       getCandyMachine();
     } catch (error) {
       console.error("Mint Error", error);
@@ -161,7 +164,7 @@ export default function Home() {
                 fontSize: "24px",
               }}
             >
-              {price} $BONK Per NFT
+              <>${price} $BONK Per NFT</>
             </h2>
             <MintContainer>
               {publicKey ? (
