@@ -5,6 +5,10 @@ import {
   styled,
   Button,
   useMediaQuery,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Link,
 } from "@mui/material";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { useEffect, useMemo, useState } from "react";
@@ -22,6 +26,9 @@ export default function Home() {
   const [candyMachine, setCandyMachine] = useState<CandyMachine | undefined>();
   const [itemsRemaining, setItemsRemaining] = useState<string>();
   const [price, setPrice] = useState<Number>(0);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [nftImage, setNftImage] = useState<string>("");
+  const [explorerLink, setExplorerLink] = useState<string>("");
 
   const { connection } = useConnection();
   const { wallet, publicKey } = useWallet();
@@ -29,6 +36,11 @@ export default function Home() {
 
   const isDesktop = useMediaQuery("(min-width: 1200px)");
   console.log(isDesktop);
+
+  const handleClose = () => {
+    setIsModalOpen(false);
+    console.log(isModalOpen);
+  };
 
   const metaplex = useMemo(() => {
     return connection
@@ -48,14 +60,12 @@ export default function Home() {
 
       const mintResponse = await mint?.response;
       if (mintResponse) {
-        enqueueSnackbar(
-          `Mint Succeeded: https://explorer.solscan.io/tx/${mintResponse.signature}`,
-          {
-            variant: "success",
-            anchorOrigin: { vertical: "top", horizontal: "right" },
-          }
-        );
-        console.log(mintResponse);
+        mint?.nft.json?.image ? setNftImage(mint?.nft.json?.image) : null;
+        mint?.response.signature
+          ? setExplorerLink(`https://solscan.io/tx/${mint?.response.signature}`)
+          : null;
+
+        setIsModalOpen(true);
       }
       getCandyMachine();
     } catch (error) {
@@ -110,10 +120,14 @@ export default function Home() {
 
   return (
     <PageWrapper>
-      <TopBar>
-        <WalletMultiButton />
-      </TopBar>
+      <TopBar>{isDesktop ? <WalletMultiButton /> : null}</TopBar>
       <MainBody>
+        <NftModal
+          isOpen={isModalOpen}
+          explorerLink={explorerLink}
+          onClose={handleClose}
+          nftImage={nftImage}
+        />
         <ImageBody>
           <img
             style={{
@@ -218,6 +232,100 @@ export default function Home() {
   );
 }
 
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  nftImage: string;
+  explorerLink: string;
+}
+
+const NftModal: React.FC<ModalProps> = ({
+  nftImage,
+  isOpen,
+  onClose,
+  explorerLink,
+}) => {
+  const [isLoading, setIsLoading] = useState(true);
+
+  return (
+    <Dialog open={isOpen} onClose={onClose}>
+      {isLoading && <CircularProgress style={{ alignSelf: "center" }} />}
+      <Box
+        style={{
+          padding: "16px",
+          display: "flex",
+          justifyContent: "flex-start",
+          flexDirection: "column",
+        }}
+      >
+        <DialogTitle>Bonkity Bonk Bonk</DialogTitle>
+        <DialogContent>
+          View your explorer{" "}
+          {
+            <Link target="_blank" href={explorerLink}>
+              Link
+            </Link>
+          }
+        </DialogContent>
+        <img
+          src={nftImage}
+          onLoad={() => setIsLoading(false)}
+          onError={() => setIsLoading(false)}
+          style={{
+            display: isLoading ? "none" : "block",
+            height: "100%",
+            width: "100%",
+            padding: "16px",
+          }}
+        />
+        <Button
+          style={{
+            margin: "8px",
+            alignSelf: "center",
+            background: "black",
+            color: "white",
+            borderRadius: "100px",
+            textTransform: "none",
+            width: "35%",
+            minWidth: "36.5px",
+          }}
+          variant="contained"
+          color="primary"
+          onClick={onClose}
+        >
+          Close Modal
+        </Button>
+      </Box>
+    </Dialog>
+  );
+};
+
+interface ImageWithLoadingIndicatorProps {
+  src: string;
+}
+const ImageWithLoadingIndicator: React.FC<ImageWithLoadingIndicatorProps> = ({
+  src,
+}) => {
+  const [isLoading, setIsLoading] = useState(true);
+
+  return (
+    <>
+      {isLoading && <CircularProgress style={{ alignSelf: "center" }} />}
+      <img
+        src={src}
+        onLoad={() => setIsLoading(false)}
+        onError={() => setIsLoading(false)}
+        style={{
+          display: isLoading ? "none" : "block",
+          height: "100%",
+          width: "100%",
+          padding: "16px",
+        }}
+      />
+    </>
+  );
+};
+
 const PageWrapper = styled(Box)`
   height: 100vh;
   width: 100vw;
@@ -283,7 +391,7 @@ const MintButton = styled(Button)(({ theme }) => ({
 
 const MintContainer = styled(Box)(({ theme }) => ({
   display: "flex",
-  border: "2px solid grey",
+  border: "2px solid rgba(185, 195, 199)",
   borderRadius: "16px",
   alignItems: "center",
   flexDirection: "column",
