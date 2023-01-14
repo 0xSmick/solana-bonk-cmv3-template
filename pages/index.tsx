@@ -16,7 +16,6 @@ import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { useEffect, useMemo, useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useSnackbar } from "notistack";
-import ContentLoader from "react-content-loader";
 
 import {
   guestIdentity,
@@ -30,6 +29,7 @@ export default function Home() {
   const [itemsRemaining, setItemsRemaining] = useState<string>();
   const [price, setPrice] = useState<Number>(0);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isFetching, setIsFetching] = useState<boolean>(false);
   const [nftImage, setNftImage] = useState<string>("");
   const [explorerLink, setExplorerLink] = useState<string>("");
 
@@ -56,19 +56,20 @@ export default function Home() {
   const onMintClick = async () => {
     try {
       if (!candyMachine) throw new Error("No CandyMachine");
+      setIsModalOpen(true);
+      setIsFetching(true);
       const mint = await metaplex?.candyMachines().mint({
         candyMachine,
         collectionUpdateAuthority: candyMachine.authorityAddress,
       });
 
       const mintResponse = await mint?.response;
+      setIsFetching(false);
       if (mintResponse) {
         mint?.nft.json?.image ? setNftImage(mint?.nft.json?.image) : null;
         mint?.response.signature
           ? setExplorerLink(`https://solscan.io/tx/${mint?.response.signature}`)
           : null;
-
-        setIsModalOpen(true);
       }
       getCandyMachine();
     } catch (error) {
@@ -123,17 +124,18 @@ export default function Home() {
 
   return (
     <PageWrapper>
-      <TopBar>
-        {isDesktop ? (
+      {isDesktop ? (
+        <TopBar>
           <WalletMultiButton style={{ background: "black", color: "white" }} />
-        ) : null}
-      </TopBar>
+        </TopBar>
+      ) : null}
       <MainBody>
         <NftModal
           isOpen={isModalOpen}
           explorerLink={explorerLink}
           onClose={handleClose}
           nftImage={nftImage}
+          isFetching={isFetching}
         />
         <ImageBody>
           <img
@@ -144,7 +146,7 @@ export default function Home() {
               width: "100%",
               justifySelf: isDesktop ? "flex-start" : "center",
             }}
-            src={process.env["NEXT_PUBLIC_COLLECTION_IMAGE"]}
+            src="https://bonk-smick.s3.us-east-2.amazonaws.com/signal-2023-01-14-122057_002.jpeg"
             alt="NFT"
           />
           <p
@@ -176,6 +178,20 @@ export default function Home() {
             >
               {process.env["NEXT_PUBLIC_CM_NAME"]}
             </h1>
+            <Box
+              style={{
+                paddingRight: isDesktop ? "0px" : "16px",
+                paddingLeft: isDesktop ? "0px" : "16px",
+                textAlign: isDesktop ? "left" : "center",
+              }}
+            >
+              <p style={{ color: "grey" }}>
+                Bonkaplex is a selection of 69 images showcasing what Midjourney
+                thinks of the word “bonk”. 6.9M $BONK per NFT (all $BONK raised
+                will be burned). Distributed with the one and only Candy Machine
+                v3.
+              </p>
+            </Box>
             <h2
               style={{
                 color: "grey",
@@ -185,7 +201,7 @@ export default function Home() {
                 fontSize: "24px",
               }}
             >
-              <>${price.toLocaleString()} BONK Per NFT</>
+              <>{price.toLocaleString()} $BONK per NFT</>
             </h2>
             <MintContainer>
               {publicKey ? (
@@ -244,6 +260,7 @@ interface ModalProps {
   onClose: () => void;
   nftImage: string;
   explorerLink: string;
+  isFetching: boolean;
 }
 
 const NftModal: React.FC<ModalProps> = ({
@@ -251,17 +268,10 @@ const NftModal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
   explorerLink,
+  isFetching,
 }) => {
-  const [isLoading, setIsLoading] = useState(true);
-
   return (
-    <Dialog
-      PaperProps={{
-        style: { borderRadius: 2 },
-      }}
-      open={isOpen}
-      onClose={onClose}
-    >
+    <Dialog open={isOpen} onClose={onClose}>
       <Box
         style={{
           padding: "6x",
@@ -273,53 +283,55 @@ const NftModal: React.FC<ModalProps> = ({
         }}
       >
         <Box style={{ display: "flex", justifyContent: "flex-end" }}>
-          <IconButton onClick={onClose}>
-            <CloseIcon />
-          </IconButton>
+          {!isFetching ? (
+            <IconButton
+              onClick={onClose}
+              style={{ color: isFetching ? "white" : "black" }}
+            >
+              <CloseIcon />
+            </IconButton>
+          ) : null}
         </Box>
-        <DialogTitle>Bonkity Bonk Bonk</DialogTitle>
-        {isLoading ? (
-          <MyLoader />
+        <DialogTitle>
+          {isFetching ? "Bonking..." : "You've been bonked"}
+        </DialogTitle>
+        {isFetching ? (
+          <DialogContent>
+            <img
+              style={{
+                display: "block",
+                height: "100%",
+                width: "100%",
+                justifySelf: "center",
+                padding: "16px",
+                maxWidth: "520px",
+                maxHeight: "520px",
+              }}
+              src={process.env["NEXT_PUBLIC_COLLECTION_IMAGE"]}
+              alt="NFT"
+            />
+            Which one will you get?
+          </DialogContent>
         ) : (
           <DialogContent>
             <img
               src={nftImage}
-              onLoad={() => setIsLoading(false)}
-              onError={() => setIsLoading(false)}
               style={{
-                display: isLoading ? "none" : "block",
+                display: "block",
                 height: "100%",
                 width: "100%",
                 padding: "16px",
               }}
             />
-            View the details{" "}
-            {
-              <Link target="_blank" href={explorerLink}>
-                here
-              </Link>
-            }
+            <Link target="_blank" href={explorerLink}>
+              View the details here
+            </Link>
           </DialogContent>
         )}
       </Box>
     </Dialog>
   );
 };
-
-const MyLoader = (props: any) => (
-  <ContentLoader
-    rtl
-    speed={2}
-    width={520}
-    height={520}
-    viewBox="0 0 520 520"
-    backgroundColor="#f3f3f3"
-    foregroundColor="#ecebeb"
-    {...props}
-  >
-    <rect x="0" y="60" rx="2" ry="2" width="520" height="520" />
-  </ContentLoader>
-);
 
 const PageWrapper = styled(Box)`
   height: 100vh;
@@ -350,7 +362,7 @@ const MainBody = styled(Box)(({ theme }) => ({
 
 const ImageBody = styled(Box)(({ theme }) => ({
   display: "flex",
-  padding: "16px",
+  padding: "16px, 16px, 0px, 16px",
   marginRight: "0px",
   alignItems: "center",
   flexDirection: "column",
@@ -386,7 +398,7 @@ const MintButton = styled(Button)(({ theme }) => ({
 
 const MintContainer = styled(Box)(({ theme }) => ({
   display: "flex",
-  border: "2px solid rgba(185, 195, 199)",
+
   borderRadius: "16px",
   alignItems: "center",
   flexDirection: "column",
@@ -399,6 +411,7 @@ const MintContainer = styled(Box)(({ theme }) => ({
     //marginRight: "60px",
     width: "100%",
     alignItems: "center",
+    border: "2px solid rgba(185, 195, 199)",
   },
 }));
 
@@ -409,12 +422,13 @@ const HeroTitleContainer = styled(Box)(({ theme }) => ({
   alignItems: "center",
   width: "100%",
   justifyContent: "center",
-  padding: "16px",
+  padding: "8px, 16px, 16px, 16px",
 
   [theme.breakpoints.up("lg")]: {
     padding: "12px",
-    marginRight: "60px",
+    marginRight: "200px",
     width: "100%",
+    maxWidth: "530px",
     alignItems: "flex-start",
   },
 }));
