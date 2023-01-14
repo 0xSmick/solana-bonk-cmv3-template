@@ -12,8 +12,9 @@
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@metaplex-foundation/js": "^0.17.12",
+    "@mui/icons-material": "^5.11.0",
     "@mui/lab": "^5.0.0-alpha.106",
-    "@mui/material": "^5.10.12",
+    "@mui/material": "^5.11.4",
     "@solana/wallet-adapter-material-ui": "^0.16.19",
     "@solana/wallet-adapter-react-ui": "^0.9.21",
     "@solana/wallet-adapter-wallets": "^0.19.5",
@@ -24,6 +25,7 @@
     "next": "13.0.1",
     "notistack": "^2.0.8",
     "react": "18.2.0",
+    "react-content-loader": "^6.2.0",
     "react-dom": "18.2.0",
     "react-made-with-love": "^1.0.1",
     "typescript": "4.8.4"

@@ -9,11 +9,14 @@ import {
   DialogTitle,
   DialogContent,
   Link,
+  IconButton,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { useEffect, useMemo, useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useSnackbar } from "notistack";
+import ContentLoader from "react-content-loader";
 
 import {
   guestIdentity,
@@ -120,7 +123,11 @@ export default function Home() {
 
   return (
     <PageWrapper>
-      <TopBar>{isDesktop ? <WalletMultiButton /> : null}</TopBar>
+      <TopBar>
+        {isDesktop ? (
+          <WalletMultiButton style={{ background: "black", color: "white" }} />
+        ) : null}
+      </TopBar>
       <MainBody>
         <NftModal
           isOpen={isModalOpen}
@@ -178,7 +185,7 @@ export default function Home() {
                 fontSize: "24px",
               }}
             >
-              <>${price} $BONK Per NFT</>
+              <>${price.toLocaleString()} BONK Per NFT</>
             </h2>
             <MintContainer>
               {publicKey ? (
@@ -200,8 +207,8 @@ export default function Home() {
               ) : (
                 <WalletMultiButton
                   style={{
-                    background: "#512da8",
                     color: "white",
+                    background: "black",
                     width: "100%",
                     borderRadius: "100px",
                     textAlign: "center",
@@ -248,83 +255,71 @@ const NftModal: React.FC<ModalProps> = ({
   const [isLoading, setIsLoading] = useState(true);
 
   return (
-    <Dialog open={isOpen} onClose={onClose}>
-      {isLoading && <CircularProgress style={{ alignSelf: "center" }} />}
+    <Dialog
+      PaperProps={{
+        style: { borderRadius: 2 },
+      }}
+      open={isOpen}
+      onClose={onClose}
+    >
       <Box
         style={{
-          padding: "16px",
+          padding: "6x",
           display: "flex",
           justifyContent: "flex-start",
           flexDirection: "column",
+          textAlign: "center",
+          borderRadius: "4px",
         }}
       >
+        <Box style={{ display: "flex", justifyContent: "flex-end" }}>
+          <IconButton onClick={onClose}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
         <DialogTitle>Bonkity Bonk Bonk</DialogTitle>
-        <DialogContent>
-          View your explorer{" "}
-          {
-            <Link target="_blank" href={explorerLink}>
-              Link
-            </Link>
-          }
-        </DialogContent>
-        <img
-          src={nftImage}
-          onLoad={() => setIsLoading(false)}
-          onError={() => setIsLoading(false)}
-          style={{
-            display: isLoading ? "none" : "block",
-            height: "100%",
-            width: "100%",
-            padding: "16px",
-          }}
-        />
-        <Button
-          style={{
-            margin: "8px",
-            alignSelf: "center",
-            background: "black",
-            color: "white",
-            borderRadius: "100px",
-            textTransform: "none",
-            width: "35%",
-            minWidth: "36.5px",
-          }}
-          variant="contained"
-          color="primary"
-          onClick={onClose}
-        >
-          Close Modal
-        </Button>
+        {isLoading ? (
+          <MyLoader />
+        ) : (
+          <DialogContent>
+            <img
+              src={nftImage}
+              onLoad={() => setIsLoading(false)}
+              onError={() => setIsLoading(false)}
+              style={{
+                display: isLoading ? "none" : "block",
+                height: "100%",
+                width: "100%",
+                padding: "16px",
+              }}
+            />
+            View the details{" "}
+            {
+              <Link target="_blank" href={explorerLink}>
+                here
+              </Link>
+            }
+          </DialogContent>
+        )}
       </Box>
     </Dialog>
   );
 };
 
-interface ImageWithLoadingIndicatorProps {
-  src: string;
-}
-const ImageWithLoadingIndicator: React.FC<ImageWithLoadingIndicatorProps> = ({
-  src,
-}) => {
-  const [isLoading, setIsLoading] = useState(true);
-
-  return (
-    <>
-      {isLoading && <CircularProgress style={{ alignSelf: "center" }} />}
-      <img
-        src={src}
-        onLoad={() => setIsLoading(false)}
-        onError={() => setIsLoading(false)}
-        style={{
-          display: isLoading ? "none" : "block",
-          height: "100%",
-          width: "100%",
-          padding: "16px",
-        }}
-      />
-    </>
-  );
-};
+const MyLoader = (props: any) => (
+  <ContentLoader
+    rtl
+    speed={2}
+    width={520}
+    height={520}
+    viewBox="0 0 520 520"
+    backgroundColor="#f3f3f3"
+    foregroundColor="#ecebeb"
+    {...props}
+  >
+    <rect x="0" y="60" rx="2" ry="2" width="520" height="520" />
+  </ContentLoader>
+);
 
 const PageWrapper = styled(Box)`
   height: 100vh;
