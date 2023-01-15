@@ -38,7 +38,8 @@ export default function Home() {
   const { enqueueSnackbar } = useSnackbar();
 
   const isDesktop = useMediaQuery("(min-width: 1200px)");
-  console.log(isDesktop);
+  const CM_ID = "5hbBGAP6pgwLKVpQVvwZKR4B1VV8zchHTqggCQBgVCpT";
+  const CM_NAME = "Bonkaplex";
 
   const handleClose = () => {
     setIsModalOpen(false);
@@ -84,9 +85,7 @@ export default function Home() {
   const getCandyMachine = async () => {
     setPageLoading(true);
     try {
-      const cmPublicKey = new PublicKey(
-        process.env["NEXT_PUBLIC_CANDYMACHINE_ID"] ?? ""
-      );
+      const cmPublicKey = new PublicKey(CM_ID ?? "");
       const candyMachine = await metaplex
         ?.candyMachines()
         .findByAddress({ address: cmPublicKey });
@@ -176,7 +175,7 @@ export default function Home() {
                 marginBlockStart: isDesktop ? ".67em" : "0px",
               }}
             >
-              {process.env["NEXT_PUBLIC_CM_NAME"]}
+              {CM_NAME}
             </h1>
             <Box
               style={{
