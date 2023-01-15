@@ -46,6 +46,16 @@ export default function Home() {
     console.log(isModalOpen);
   };
 
+  const buttonText = () => {
+    if (candyMachine?.itemsRemaining.toString() == "0") {
+      return "Sold out!";
+    } else if (publicKey) {
+      return "Mint";
+    } else {
+      return "Connect Wallet";
+    }
+  };
+
   const metaplex = useMemo(() => {
     return connection
       ? Metaplex.make(connection)?.use(
@@ -159,7 +169,9 @@ export default function Home() {
               marginBlockEnd: "0px",
             }}
           >
-            {itemsRemaining} available
+            {candyMachine?.itemsRemaining.toString() == "0"
+              ? "SOLD OUT!"
+              : `${itemsRemaining} available`}
           </p>
         </ImageBody>
 
@@ -205,7 +217,11 @@ export default function Home() {
                 <MintButton
                   size="large"
                   onClick={onMintClick}
-                  disabled={!candyMachine || !publicKey}
+                  disabled={
+                    !candyMachine ||
+                    !publicKey ||
+                    candyMachine?.itemsRemaining.toString() == "0"
+                  }
                 >
                   <p
                     style={{
@@ -214,7 +230,7 @@ export default function Home() {
                       textTransform: "none",
                     }}
                   >
-                    {publicKey ? "Mint" : "Connect Your Wallet"}
+                    {buttonText()}
                   </p>
                 </MintButton>
               ) : (
