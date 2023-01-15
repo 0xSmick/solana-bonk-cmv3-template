@@ -38,7 +38,7 @@ export default function Home() {
   const { enqueueSnackbar } = useSnackbar();
 
   const isDesktop = useMediaQuery("(min-width: 1200px)");
-  const CM_ID = "5hbBGAP6pgwLKVpQVvwZKR4B1VV8zchHTqggCQBgVCpT";
+  const CM_ID = "ETJtKSxuGxU4FpQMsngvQZy7c6evz4jJPzcZC8QtJ77J";
   const CM_NAME = "Bonkaplex";
 
   const handleClose = () => {
@@ -117,7 +117,7 @@ export default function Home() {
     const price = Number(
       candyMachine?.candyGuard?.guards.tokenPayment?.amount.basisPoints.toString()
     );
-    setPrice(price / 1000000000);
+    setPrice(price / 100000);
     console.log(price);
   }, [candyMachine]);
 

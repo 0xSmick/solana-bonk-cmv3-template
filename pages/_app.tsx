@@ -26,9 +26,12 @@ const darkTheme = createTheme({
 });
 
 export default function App({ Component, pageProps }: AppProps) {
-  const network = process.env["NEXT_PUBLIC_SOLANA_NETWORK"]
-    ? (process.env["NEXT_PUBLIC_SOLANA_NETWORK"] as WalletAdapterNetwork)
-    : ("devnet" as WalletAdapterNetwork);
+  const network = WalletAdapterNetwork.Mainnet;
+  const endpoint = "https://api.metaplex.solana.com";
+
+  // const network = process.env["NEXT_PUBLIC_SOLANA_NETWORK"]
+  //   ? (process.env["NEXT_PUBLIC_SOLANA_NETWORK"] as WalletAdapterNetwork)
+  //   : ("devnet" as WalletAdapterNetwork);
   const wallets = useMemo(
     () => [
       new PhantomWalletAdapter(),
@@ -43,7 +46,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <>
       <CssBaseline />
       <SnackbarProvider>
-        <ConnectionProvider endpoint={clusterApiUrl(network)}>
+        <ConnectionProvider endpoint={endpoint}>
           <WalletProvider wallets={wallets} autoConnect>
             <WalletModalProvider>
               <Component {...pageProps} />
