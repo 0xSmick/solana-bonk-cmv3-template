@@ -146,7 +146,7 @@ export default function Home() {
               width: "100%",
               justifySelf: isDesktop ? "flex-start" : "center",
             }}
-            src="https://bonk-smick.s3.us-east-2.amazonaws.com/signal-2023-01-14-122057_002.jpeg"
+            src="https://bonk-smick.s3.us-east-2.amazonaws.com/bonkagrid.png"
             alt="NFT"
           />
           <p
@@ -187,9 +187,7 @@ export default function Home() {
             >
               <p style={{ color: "grey" }}>
                 Bonkaplex is a selection of 69 images showcasing what Midjourney
-                thinks of the word “bonk”. 6.9M $BONK per NFT (all $BONK raised
-                will be burned). Distributed with the one and only Candy Machine
-                v3.
+                thinks of the word “bonk”. All $BONK raised will be burned.
               </p>
             </Box>
             <h2
@@ -293,7 +291,7 @@ const NftModal: React.FC<ModalProps> = ({
           ) : null}
         </Box>
         <DialogTitle>
-          {isFetching ? "Bonking..." : "You've been bonked"}
+          {isFetching ? "Bonking..." : "You've been bonked, enjoy your NFT!"}
         </DialogTitle>
         {isFetching ? (
           <DialogContent>
@@ -333,13 +331,18 @@ const NftModal: React.FC<ModalProps> = ({
   );
 };
 
-const PageWrapper = styled(Box)`
-  height: 100vh;
-  width: 100vw;
-  background: white;
-  display: flex;
-  flex-direction: column;
-`;
+const PageWrapper = styled(Box)(({ theme }) => ({
+  height: "100vh",
+  width: "100vw",
+  background: "white",
+  display: "flex",
+  flexDirection: "column",
+  overflow: "hidden",
+  marginTop: "16px",
+  [theme.breakpoints.up("lg")]: {
+    overflow: "auto",
+  },
+}));
 
 const TopBar = styled(Box)`
   display: flex;
@@ -366,6 +369,8 @@ const ImageBody = styled(Box)(({ theme }) => ({
   marginRight: "0px",
   alignItems: "center",
   flexDirection: "column",
+  width: "75%",
+  height: "75%",
   flex: 1,
 
   [theme.breakpoints.up("lg")]: {
@@ -420,7 +425,7 @@ const HeroTitleContainer = styled(Box)(({ theme }) => ({
   flex: 1,
   flexDirection: "column",
   alignItems: "center",
-  width: "100%",
+  width: "90%",
   justifyContent: "center",
   padding: "8px, 16px, 16px, 16px",
 
