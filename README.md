@@ -1,5 +1,5 @@
 # Intro
-This is a Mint Page which can work with CMV3 (Candy Machine V3) for NFT drops. This was created purely as a fun project and is free for anyone to use. 
+This is a Mint Page which can work with CMV3 (Candy Machine V3) for NFT drops on the Solana Blockchain. This was created purely as a fun project where users could pay for NFTs in $BONK. This repo is free for anyone to use, but will not be maitained or updated. Use at your own risk.  
 
 # Candymachine setup
 1. Download sugar's latest [build](https://github.com/metaplex-foundation/sugar/tree/alpha+CMv3)
